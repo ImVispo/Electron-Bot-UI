@@ -1,0 +1,93 @@
+.ant-layout,
+.ant-layout-footer {
+  background: #ffffff
+}
+
+/* Container Padding */
+
+.container,
+.action-btns {
+  padding: 10px !important;
+}
+
+/* Removes topward padding */
+
+.container {
+  padding-top: 0 !important;
+}
+
+/* Padding between task header and task section */
+
+.section-header {
+  margin-bottom: 10px;
+}
+
+/* Task header search 50% */
+
+.task-search {
+  width: 48%;
+}
+
+/* Task header action buttons spacing in between */
+
+.section-header .action-btn {
+  margin-right: 1%;
+  width: 12%
+}
+
+/* Task action buttons spacing in between */
+
+.task-action-btns Button {
+  margin-right: 5px;
+}
+
+/* Tables */
+.ant-table table {
+  table-layout: auto !important;
+}
+
+/* Task Creation Modal for inline form items */
+
+.inline-form-items {
+  display: flex;
+  justify-content: space-between;
+}
+
+.inline-form-items .inline-form-item {
+  width: calc(49%);
+}
+
+.inline-form-items.with-quanity .inline-form-item {
+  width: calc(38.5%);
+}
+
+.inline-form-items.proxies .inline-form-item {
+  width: calc(22%);
+}
+
+.inline-form-items.five .inline-form-item {
+  width: calc(25%);
+}
+
+.inline-form-items .inline-form-item.secondary {
+  width: calc(10%);
+}
+
+/* Settings Container */
+
+.container.full {
+  width: 90%;
+}
+
+/* Empty */
+
+.container .ant-empty {
+  height: calc(100vh - 241px) !important;
+  padding-top: 30vh;
+}
+
+Footer {
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+}

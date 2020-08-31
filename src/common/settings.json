@@ -1,0 +1,9 @@
+{
+  "license": "926e1707-7450-4b38-a49b-5e8822b8c95f",
+  "webhook": "https://discordapp.com/api/webhooks/745898148941004830/Ki9KqBXJ4RIJaCeMdBD9YqWZ4_PZBPq6ammTwTcCcfnGO19bCcHfB1jZcIqtJV_G1ak5",
+  "monitorDelay": "1000",
+  "retryDelay": "1000",
+  "twoCaptcha": "",
+  "antiCaptcha": "",
+  "autoSolve": ""
+}

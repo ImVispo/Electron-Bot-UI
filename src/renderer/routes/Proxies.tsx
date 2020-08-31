@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 import {
@@ -21,6 +20,7 @@ import {
 } from '@ant-design/icons';
 
 import { ipcRenderer } from 'electron';
+import { useVT } from 'virtualizedtableforantd4';
 
 import Store from '../store/Store';
 import { ProxyCreationModal } from '../../common/types';
@@ -41,10 +41,13 @@ export const Proxies = () => {
         ? <ProxyTable proxyList={proxyListActive} />
         : <Empty
           image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-          imageStyle={{ height: 60 }}
-          description={<span>No proxies found... load some or create a list!</span>}
-        ></Empty>
-      }
+          imageStyle={{
+            height: 60,
+          }}
+          description={
+            <span>No proxies found... load some or create a list!</span>
+          }
+        ></Empty>}
     </div>
   )
 }
@@ -54,6 +57,10 @@ const ProxiesHeader = () => {
   const proxies = store.get('proxies');
   const proxyListActive = store.get('proxyListActive');
   const selectedRowKeys = store.get('proxySelectedRowKeys');
+
+  const handleChange = async (value: string) => {
+    store.set('proxyListActive')(value);
+  }
 
   const handleDelete = async () => {
     if (proxyListActive) {
@@ -84,46 +91,38 @@ const ProxiesHeader = () => {
     }
   }
 
-  const handleChange = async (value: string) => {
-    store.set('proxyListActive')(value);
-  }
-
   return (
     <div className="section-header">
       <div className="inline-form-items proxies">
         <Button
           className="inline-form-item secondary"
           onClick={() => store.set('ProxyCreationModal')({ visible: true })}
-        ><PlusOutlined />Create
-        </Button>
+        ><PlusOutlined />Create</Button>
         <Select
           className="inline-form-item"
           onChange={handleChange}
           value={proxyListActive}
-        >{Object.keys(proxies).map((p) => {
-          return <Option key={p} value={p}>{p}</Option>
-        })}
+        >
+          {Object.entries(proxies).map((p) => {
+            return <Option key={p[0]} value={p[0]}>{p[0]} ({p[1].length})</Option>
+          })}
         </Select>
         <Button
           className="inline-form-item"
-          onClick={handleDelete}
           type="primary"
           danger
-        ><DeleteOutlined />Delete {selectedRowKeys.length === 0 ? 'All' : 'Selected'}
-        </Button>
+          onClick={handleDelete}
+        ><DeleteOutlined />Delete {selectedRowKeys.length === 0 ? 'All' : 'Selected'}</Button>
         <Button
           className="inline-form-item"
           type="primary"
-        ><ThunderboltOutlined />Test {selectedRowKeys.length === 0 ? 'All' : 'Selected'}
-        </Button>
+        ><ThunderboltOutlined />Test {selectedRowKeys.length === 0 ? 'All' : 'Selected'}</Button>
         <Button
           className="inline-form-item secondary"
-        ><DownloadOutlined />Import
-        </Button>
+        ><DownloadOutlined />Import</Button>
         <Button
           className="inline-form-item secondary"
-        ><UploadOutlined />Export
-        </Button>
+        ><UploadOutlined />Export</Button>
       </div>
     </div>
   )
@@ -138,6 +137,7 @@ const ProxyTable = ({ proxyList }: { proxyList: string }) => {
     const p = proxy.split(':');
     return {
       key: proxy,
+      id: activeProxyList.indexOf(proxy),
       ip: p[0],
       port: p[1],
       user: p[2] ? p[2] : '',
@@ -164,27 +164,31 @@ const ProxyTable = ({ proxyList }: { proxyList: string }) => {
     onChange: onSelectedRowKeysChange,
   };
 
+  const [ vt ] = useVT(() => ({ scroll: { y: "calc(100vh - 241px)" } }), []);
+
   return (
     <Table
+      components={vt}
+      // size="middle"
+      tableLayout="auto"
+      scroll={{ y: "calc(100vh - 241px)" }}
       dataSource={activeProxies}
       pagination={false}
       rowSelection={rowSelection}
-      scroll={{ y: "calc(100vh - 241px)" }}
-      size="middle"
-      tableLayout="auto"
       onRow={(record) => ({
         onClick: () => {
           selectRow(record);
         },
       })}
     >
+      <Column title="ID" dataIndex="id" key="id" ellipsis={true} />
       <Column title="IP" dataIndex="ip" key="ip" ellipsis={true} />
       <Column title="Port" dataIndex="port" key="port" width={100} ellipsis={true} />
       <Column title="User" dataIndex="user" key="user" width={200} ellipsis={true} />
       <Column title="Pass" dataIndex="pass" key="pass" width={200} ellipsis={true} />
       <Column
-        key="status"
         title="Status"
+        key="status"
         width={150}
         render={() => (
           <Tag key="status">
@@ -197,8 +201,12 @@ const ProxyTable = ({ proxyList }: { proxyList: string }) => {
         key="actions"
         render={() => (
           <div className="task-action-btns">
-            <Button size="small"><ThunderboltOutlined /></Button>
-            <Button size="small" type="primary" danger><DeleteOutlined /></Button>
+            <Button size="small">
+              <ThunderboltOutlined />
+            </Button>
+            <Button size="small" type="primary" danger>
+              <DeleteOutlined />
+            </Button>
           </div>
         )}
       />
@@ -214,8 +222,8 @@ const ProxyCreationModal = (state: ProxyCreationModal) => {
     form
       .validateFields()
       .then(async (instructions) => {
+        let proxies = instructions.proxies.trim().split('\n');
         const name = instructions.name;
-        let proxies = instructions.proxies.split('\n');
         proxies = ipcRenderer.sendSync('add-proxies', name, proxies);
         form.resetFields();
         store.set('proxies')(proxies);
@@ -236,26 +244,28 @@ const ProxyCreationModal = (state: ProxyCreationModal) => {
     <Modal
       title="Create Proxy List"
       okText="Create"
-      onOk={onSubmit}
-      visible={state.visible}
-      onCancel={() => store.set('ProxyCreationModal')({ visible: false })}
       centered
+      visible={state.visible}
+      onOk={onSubmit}
+      onCancel={() => store.set('ProxyCreationModal')({ visible: false })}
     >
       <Form
         layout={'vertical'}
         form={form}
       >
         <Form.Item
-          label="Proxy List Name"
           name="name"
+          label="Proxy List Name"
           rules={[{ required: true, message: "Please enter a proxy list name" }]}
-        ><Input placeholder="name" />
+        >
+          <Input placeholder="name" />
         </Form.Item>
         <Form.Item
-          label="Proxies"
           name="proxies"
+          label="Proxies"
           rules={[{ required: true, message: "Please enter proxies" }]}
-        ><TextArea rows={6} placeholder="ip:port:user:pass" />
+        >
+          <TextArea rows={6} placeholder="ip:port:user:pass" />
         </Form.Item>
       </Form>
     </Modal>

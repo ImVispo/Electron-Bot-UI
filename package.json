@@ -20,7 +20,8 @@
     "react-router-dom": "^5.2.0",
     "react-sortable-hoc": "^1.11.0",
     "source-map-support": "^0.5.19",
-    "undux": "^5.2.0"
+    "undux": "^5.2.0",
+    "virtualizedtableforantd4": "^1.0.0"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.10.4",
@@ -38,7 +39,8 @@
       "undux",
       "react-router-dom",
       "react-select",
-      "antd"
+      "antd",
+      "virtualizedtableforantd4"
     ]
   }
 }

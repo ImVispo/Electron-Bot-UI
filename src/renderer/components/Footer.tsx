@@ -7,7 +7,7 @@ export const BotFooter = () => {
   return (
     <Footer
       style={{ textAlign: 'center' }}
-    >Shibob ©2020 Created with ❤️ by Vispo and Shihab
+    >Shibob ©2020 Created with ❤️ by Vispo
     </Footer>
   )
 }
